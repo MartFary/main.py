@@ -1,105 +1,88 @@
 
-#projekt_1.py: první projekt do Engeto online python Akademie
+#projekt_2.py: druhý projekt do Engeto Online Python Akademie
 #
 #author: Martina Farkavcová
 #email: martinafarkavcova@gmail.com
 
-TEXTS = [
-    '''Situated about 10 miles west of Kemmerer,
-    Fossil Butte is a ruggedly impressive
-    topographic feature that rises sharply
-    some 1000 feet above Twin Creek Valley
-    to an elevation of more than 7500 feet
-    above sea level. The butte is located just
-    north of US 30 and the Union Pacific Railroad,
-    which traverse the valley.''',
-    '''At the base of Fossil Butte are the bright
-    red, purple, yellow and gray beds of the Wasatch
-    Formation. Eroded portions of these horizontal
-    beds slope gradually upward from the valley floor
-    and steepen abruptly. Overlying them and extending
-    to the top of the butte are the much steeper
-    buff-to-white beds of the Green River Formation,
-    which are about 300 feet thick.''',
-    '''The monument contains 8198 acres and protects
-    a portion of the largest deposit of freshwater fish
-    fossils in the world. The richest fossil fish deposits
-    are found in multiple limestone layers, which lie some
-    100 feet below the top of the butte. The fossils
-    represent several varieties of perch, as well as
-    other freshwater genera and herring similar to those
-    in modern oceans. Other fish such as paddlefish,
-    garpike and stingray are also present.'''
-]
+import random
 
-user = ["bob", "ann", "mike", "liz"]
-password = ["123", "pass123", "password123", "pass123"]
-registrovany = dict(zip(user, password))
+def uvitaci_zprava():    #program pozdraví uživatele a vypíše úvodní text.
+    print("Hi there!")
+    print("I've generated a random 4 digit number for you. \nLet's play a bulls and cows game.")
+    print("Enter a number:")
 
-jmeno = input("Zadej jméno:").strip()   # doplněn strip dle zpětné vazby bod č.2
-heslo = input("Zadej heslo:").strip()   # doplněn strip dle zpětné vazby bod č.2
+def tajne_cislo():    #program vytvoří tajné 4 místné číslo (číslice musí být unikátní a nesmí začínat 0).
+    seznam_cisel = list("0123456789")
+    cislo = ""
 
-if jmeno in registrovany and registrovany[jmeno] == heslo:
-    print(f"Vítám tě v aplikaci, {jmeno}. \nMáme 3 texty k analýze.")
-    cislo_textu = input("Zadej číslo textu od 1 do 3 k analýze:")
-    if not cislo_textu.isdigit():
-        print("Špatně zadané číslo.")
+    while True:
+        cislo = "".join(random.sample(seznam_cisel, 4))
+        if cislo[0] != "0":
+            return cislo
+        
+# test funkce tajne_cislo for _ in range(4):        
+#                            print(tajne_cislo())
+
+def validni_cislo_uzivatele(uzivatel):    #Program uživatele upozorní na chybně zadané číslo
+    if len(uzivatel) != 4:
+        return False, "Zadej 4 čísla."
+    if not uzivatel.isdigit():
+        return False, "Neplatné znaky, zadej pouze čísla."
+    if uzivatel[0] == "0":
+        return False, "Číslo nesmí začínat nulou."
+    if len(set(uzivatel)) != 4:
+        return False, "Čísla se nesmí opakovat."
+    return True, ""
+
+# test ověření funkce hádání čísla uživatelem:
+# uzivatel = input("Zadej číslo: ")
+# validni, error = validni_cislo_uzivatele(uzivatel)
+# if not validni:
+#    print("Chyba:", error)
+
+def vyhodnoceni_tipu_uzivatele(uzivatel, tajne_cislo):    # vyhodnotí tip od uživatele
+    bulls = 0
+    cows = 0
+
+    for pozice in range(4):
+        if uzivatel[pozice] == tajne_cislo[pozice]:
+            bulls += 1
+        elif uzivatel[pozice] in tajne_cislo:
+            cows += 1
+
+    return bulls, cows
+
+def pluralize(word, count):    #ošetření gramatiky pomocí funkce pluralize
+    if count == 1:
+        return f"{count} {word}"
     else:
-        cislo = int(cislo_textu)
-        if 1 <= cislo <= 3:
-            text = TEXTS[cislo - 1]
-            print(f"Analyzuji text číslo {cislo}")
+        return f"{count} {word}s"
 
-            slova = text.split()
+# Spuštění celé hry + navíc jsem omezila počet pokusů na 10 a při prohře jsem chtěla vědět, 
+# jaké bylo to hádané číslo, protože jsem to na 10 pokusů většinou neuhodla :-)
 
-            slova_pocet_all = len(slova)
-            slova_prvni_velke = 0
-            slova_vse_velke = 0
-            slova_vse_male = 0
-            slova_cisla = 0
-            slova_cisla_soucet = 0
+uvitaci_zprava()
+hadane_cislo = tajne_cislo()
+pokus = 0
+max_pokusu = 10    #omezení počtu pokusů na 10
 
-            for slovo in slova:
-                ocisteno = slovo.strip(".,!?;:-()[]""")    #doplněny další znaky dle zpětné vazby bod č.3
+while True:
+    if pokus >= max_pokusu:
+        print(f"Vyčerpáno 10 pokusů. \nTajné číslo bylo: {hadane_cislo} \nZahraj si novou hru.")
+        break
 
-                if ocisteno.istitle():
-                    slova_prvni_velke = slova_prvni_velke + 1
-                elif ocisteno.isupper():
-                    slova_vse_velke = slova_vse_velke + 1
-                elif ocisteno.islower():
-                    slova_vse_male = slova_vse_male + 1
-                if ocisteno.isdigit():
-                    slova_cisla = slova_cisla + 1
-                    slova_cisla_soucet += int(ocisteno)
-                
+    uzivatel = input(">> ")
+    validni, error = validni_cislo_uzivatele(uzivatel)
 
-            print(f"Ve vybraném textu je {slova_pocet_all} slov.")
-            print(f"Ve vybraném textu je {slova_prvni_velke} slov, která začínají velkým písmenem.")
-            print(f"Ve vybraném textu je {slova_vse_velke} slov, která jsou psaná velkými písmeny.")
-            print(f"Ve vybraném textu je {slova_vse_male} slov, která jsou psaná malými písmeny.")
-            print(f"Ve vybraném textu je {slova_cisla} slov ve formátu čísel.")
-            print(f"Ve vybraném textu je součet všech čísel {slova_cisla_soucet}.")
+    if not validni:
+        print("Chyba:", error)
+        continue
 
-            print("Grafické znázornění délky slov v analyzovaném textu.")
-            print(f"{'DÉLKA':<6} | {'GRAF':<20} | {'VÝSKYT':<7}")
-            cetnost_znaku = {}
+    pokus += 1
+    bulls, cows = vyhodnoceni_tipu_uzivatele(uzivatel, hadane_cislo)
 
-            for slovo in slova:
-                ocisteno = slovo.strip(".,!?")
-                delka = len(ocisteno)
-                                                # odebráno duplikované sčítání slov dle zpětné vazby bod č.1
-                if delka in cetnost_znaku:
-                    cetnost_znaku[delka] = cetnost_znaku[delka] + 1
-                else: 
-                    cetnost_znaku[delka] = 1
+    print(f"{pluralize('bull', bulls)}, {pluralize('cow', cows)}")
 
-            for delka in sorted(cetnost_znaku):
-                pocet = cetnost_znaku[delka]
-                graf = "*" * pocet
-
-                print(f"{delka:<6} | {graf:<20} | {pocet:<7}")
-
-        else:
-            print("Číslo není v zadaném rozmezí.")
-else:
-    print("Špatné jméno nebo heslo.")
+    if bulls == 4:
+        print(f"Gratuluji k uhodnutí tajného čísla!")
+        break
